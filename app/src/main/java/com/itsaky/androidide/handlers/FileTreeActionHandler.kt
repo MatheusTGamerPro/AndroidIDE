@@ -44,6 +44,7 @@ import com.itsaky.androidide.models.SheetOption
 import com.itsaky.androidide.projects.ProjectManager.getProjectDirPath
 import com.itsaky.androidide.utils.DialogUtils
 import com.itsaky.androidide.utils.Environment
+import com.itsaky.androidide.utils.ILogger
 import com.itsaky.androidide.utils.ProjectWriter
 import com.itsaky.toaster.Toaster.Type.ERROR
 import com.itsaky.toaster.Toaster.Type.SUCCESS
@@ -64,6 +65,7 @@ import java.util.regex.*
 class FileTreeActionHandler : BaseEventHandler() {
 
   private var lastHeld: TreeNode? = null
+  private var LOG: ILogger = ILogger.newInstance("FileTreeActionHandler")
 
   companion object {
     const val TAG_FILE_OPTIONS_FRAGMENT = "file_options_fragment"
@@ -328,7 +330,23 @@ class FileTreeActionHandler : BaseEventHandler() {
   private fun createFile(context: Context, directory: File, name: String, content: String) {
     val app = StudioApp.getInstance()
     if (name.length in 1..40 && !name.startsWith("/")) {
+      val projectDir = getProjectDirPath() + "/app/src/main/res/layout/"
       val newFile = File(directory, name)
+      val newFileLayout = File(projectDir, name.replace(".java", ".xml"))
+      
+      // Show directory in Logs
+      LOG.info(directory.absolutePath)
+
+      if (newFileLayout.exists()) {
+        app.toast(string.msg_file_exists, ERROR)
+      } else {
+        if (FileIOUtils.writeFileFromString(newFileLayout, ProjectWriter.createLayout())) {
+          notifyFileCreated(newFileLayout)
+        } else {
+          app.toast(string.msg_file_creation_failed, ERROR)
+        }
+      }
+      
       if (newFile.exists()) {
         app.toast(string.msg_file_exists, ERROR)
       } else {
