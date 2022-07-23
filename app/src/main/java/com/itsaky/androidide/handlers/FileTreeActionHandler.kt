@@ -330,13 +330,11 @@ class FileTreeActionHandler : BaseEventHandler() {
   private fun createFile(context: Context, directory: File, name: String, content: String) {
     val app = StudioApp.getInstance()
     if (name.length in 1..40 && !name.startsWith("/")) {
-      val projectDir = getProjectDirPath() + "/app/src/main/res/layout/"
+      val pkgName = ProjectWriter.getPackageName(directory)
+      val projectDir = directory.replace("java/$pkgName", "/res/layout/")
       val newFile = File(directory, name)
       val newFileLayout = File(projectDir, name.replace(".java", ".xml"))
       
-      // Show directory in Logs
-      LOG.info(directory.absolutePath)
-
       if (newFileLayout.exists()) {
         app.toast(string.msg_file_exists, ERROR)
       } else {
