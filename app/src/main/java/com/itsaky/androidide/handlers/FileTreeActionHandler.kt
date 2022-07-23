@@ -334,9 +334,9 @@ class FileTreeActionHandler : BaseEventHandler() {
       if (pkgName.contains(".")) {
         pkgName.replace(".", "/")
       }
-      val projectDir = directory.replace("java/"+pkgName, "/res/layout/")
+      val projectDir = directory.replace("java/"+pkgName, "res/layout/")
       val newFile = File(directory, name)
-      val newFileLayout = File(projectDir, name.replace(".java"+pkgName, ".xml"))
+      val newFileLayout = File(projectDir, name.replace(".java", ".xml"))
       
       if (newFileLayout.exists()) {
         app.toast(string.msg_file_exists, ERROR)
