@@ -214,10 +214,10 @@ class FileTreeActionHandler : BaseEventHandler() {
       dialogInterface.dismiss()
       val name: String = binding.name.editText!!.text.toString().trim()
       val pkgName = ProjectWriter.getPackageName(file)
-      packageName = pkgName
       if (pkgName == null || pkgName.trim { it <= ' ' }.isEmpty()) {
         StudioApp.getInstance().toast(string.msg_get_package_failed, ERROR)
       } else {
+        packageName = pkgName.toString()
         val id: Int = binding.typeGroup.checkedButtonId
         val javaName = if (name.endsWith(".java")) name else "$name.java"
         val className = if (!name.contains(".")) name else name.substring(0, name.lastIndexOf("."))
@@ -332,8 +332,8 @@ class FileTreeActionHandler : BaseEventHandler() {
   private fun createFile(context: Context, directory: File, name: String, content: String) {
     val app = StudioApp.getInstance()
     if (name.length in 1..40 && !name.startsWith("/")) {
-      val pkgName = packageName.replace(".", "/")
-      val projectDir = directory.replace("java/$pkgName", "res/layout/")
+      val pkgName: String = PackageName.replace(".", "/")
+      val projectDir: String = directory.replace("java/"+pkgName, "res/layout/")
       val newFile = File(directory, name)
       val newFileLayout = File(projectDir, name.replace(".java", ".xml"))
 
