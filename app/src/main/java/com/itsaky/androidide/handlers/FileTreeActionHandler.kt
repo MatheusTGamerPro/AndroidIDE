@@ -64,6 +64,8 @@ import java.util.regex.*
 class FileTreeActionHandler : BaseEventHandler() {
 
   private var lastHeld: TreeNode? = null
+  private var packageName: String = ""
+  private var autoLayout: Boolean = false
 
   companion object {
     const val TAG_FILE_OPTIONS_FRAGMENT = "file_options_fragment"
@@ -209,11 +211,13 @@ class FileTreeActionHandler : BaseEventHandler() {
     builder.setTitle(string.new_java_class)
     builder.setPositiveButton(string.text_create) { dialogInterface, _ ->
       dialogInterface.dismiss()
+      autoLayout = binding.checkButton.isChecked
       val name: String = binding.name.editText!!.text.toString().trim()
       val pkgName = ProjectWriter.getPackageName(file)
       if (pkgName == null || pkgName.trim { it <= ' ' }.isEmpty()) {
         StudioApp.getInstance().toast(string.msg_get_package_failed, ERROR)
       } else {
+        packageName = pkgName.toString().replace(".", "/")
         val id: Int = binding.typeGroup.checkedButtonId
         val javaName = if (name.endsWith(".java")) name else "$name.java"
         val className = if (!name.contains(".")) name else name.substring(0, name.lastIndexOf("."))
@@ -247,6 +251,25 @@ class FileTreeActionHandler : BaseEventHandler() {
       ProjectWriter.createLayout(),
       ".xml"
     )
+  }
+
+  private fun createAutoLayout(directory: File, fileName: String) {
+    val app = StudioApp.getInstance()
+    val dirType = if (directory.contains("java/")) "java/" else "kotlin/"
+    val fileType = if (fileName.endsWith(".java")) ".java" else ".kt"
+    val projectDir = directory.toString().replace("$dirType/$packageName", "res/layout/")
+    val layoutName = ProjectWriter.createLayoutName(fileName.replace(fileType, ".xml"))
+    val newFileLayout = File(projectDir, layoutName)
+
+    if (newFileLayout.exists()) {
+      app.toast(string.msg_file_exists, ERROR)
+    } else {
+      if (FileIOUtils.writeFileFromString(newFileLayout, ProjectWriter.createLayout())) {
+        notifyFileCreated(newFileLayout)
+      } else {
+        app.toast(string.msg_file_creation_failed, ERROR)
+      }
+    }
   }
 
   private fun createMenuRes(context: Context, file: File) {
@@ -333,6 +356,7 @@ class FileTreeActionHandler : BaseEventHandler() {
         app.toast(string.msg_file_exists, ERROR)
       } else {
         if (FileIOUtils.writeFileFromString(newFile, content)) {
+          if (autoLayout) createAutoLayout(directory, name)
           notifyFileCreated(newFile)
           // TODO Notify language servers about file created event
           app.toast(string.msg_file_created, SUCCESS)
