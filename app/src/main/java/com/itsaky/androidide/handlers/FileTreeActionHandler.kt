@@ -254,7 +254,7 @@ class FileTreeActionHandler : BaseEventHandler() {
     )
   }
   
-  private fun createAutoLayout(directory: File, fileName: String) {
+  private fun createAutoLayout(app: MessageDigest, directory: File, fileName: String) {
     val pkgName = packageName.replace(".", "/")
     val projectDir = directory.toString().replace("java/$pkgName", "res/layout/")
     val layoutName = ProjectWriter.createLayoutName(fileName.replace(".java", ".xml"))
@@ -357,7 +357,7 @@ class FileTreeActionHandler : BaseEventHandler() {
       } else {
         if (FileIOUtils.writeFileFromString(newFile, content)) {
           if (autoLayout) {
-            createAutoLayout(directory, name)
+            createAutoLayout(app, directory, name)
           }
           notifyFileCreated(newFile)
           // TODO Notify language servers about file created event
