@@ -256,9 +256,10 @@ class FileTreeActionHandler : BaseEventHandler() {
   
   private fun createAutoLayout(directory: File, fileName: String) {
     val app = StudioApp.getInstance()
-    val pkgName = packageName.replace(".", "/")
-    val projectDir = directory.toString().replace("java/$pkgName", "res/layout/")
-    val layoutName = ProjectWriter.createLayoutName(fileName.replace(".java", ".xml"))
+    val dirType = if (directory.toString().contains("java/")) "java/" else "kotlin/"
+    val fileType = if (fileName.endsWith(".java")) ".java" else ".kt"
+    val projectDir = directory.toString().replace("$dirType/$packageName", "res/layout/")
+    val layoutName = ProjectWriter.createLayoutName(fileName.replace(fileType, ".xml"))
     val newFileLayout = File(projectDir, layoutName)
 
     if (newFileLayout.exists()) {
@@ -357,7 +358,11 @@ class FileTreeActionHandler : BaseEventHandler() {
         app.toast(string.msg_file_exists, ERROR)
       } else {
         if (FileIOUtils.writeFileFromString(newFile, content)) {
-          if (autoLayout) createAutoLayout(directory, name)
+          if (autoLayout) {
+            createAutoLayout(directory, name)
+          } else if (name,endsWith(".kt")) {
+            createAutoLayout(directory, name)
+          }
           notifyFileCreated(newFile)
           // TODO Notify language servers about file created event
           app.toast(string.msg_file_created, SUCCESS)
