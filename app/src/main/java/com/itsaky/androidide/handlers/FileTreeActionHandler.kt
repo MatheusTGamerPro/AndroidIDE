@@ -253,6 +253,23 @@ class FileTreeActionHandler : BaseEventHandler() {
       ".xml"
     )
   }
+  
+  private fun createAutoLayout(directory: File, fileName: String) {
+    val pkgName = packageName.replace(".", "/")
+    val projectDir = directory.toString().replace("java/$pkgName", "res/layout/")
+    val layoutName = ProjectWriter.createLayoutName(fileName.replace(".java", ".xml"))
+    val newFileLayout = File(projectDir, layoutName)
+
+    if (newFileLayout.exists()) {
+      app.toast(string.msg_file_exists, ERROR)
+    } else {
+      if (FileIOUtils.writeFileFromString(newFileLayout, ProjectWriter.createLayout())) {
+        notifyFileCreated(newFileLayout)
+      } else {
+        app.toast(string.msg_file_creation_failed, ERROR)
+      }
+    }
+  }
 
   private fun createMenuRes(context: Context, file: File) {
     createNewFileWithContent(
@@ -333,26 +350,15 @@ class FileTreeActionHandler : BaseEventHandler() {
   private fun createFile(context: Context, directory: File, name: String, content: String) {
     val app = StudioApp.getInstance()
     if (name.length in 1..40 && !name.startsWith("/")) {
-      val pkgName = packageName.replace(".", "/")
-      val layoutName = ProjectWriter.createLayoutName(name.replace(".java", ".xml"))
-      val projectDir = directory.toString().replace("java/$pkgName", "res/layout/")
       val newFile = File(directory, name)
-      val newFileLayout = File(projectDir, layoutName)
-
-      if (newFileLayout.exists()) {
-        app.toast(string.msg_file_exists, ERROR)
-      } else {
-        if (FileIOUtils.writeFileFromString(newFileLayout, ProjectWriter.createLayout())) {
-          notifyFileCreated(newFileLayout)
-        } else {
-          app.toast(string.msg_file_creation_failed, ERROR)
-        }
-      }
 
       if (newFile.exists()) {
         app.toast(string.msg_file_exists, ERROR)
       } else {
         if (FileIOUtils.writeFileFromString(newFile, content)) {
+          if (autoLayout) {
+            createAutoLayout(directory, name)
+          }
           notifyFileCreated(newFile)
           // TODO Notify language servers about file created event
           app.toast(string.msg_file_created, SUCCESS)
