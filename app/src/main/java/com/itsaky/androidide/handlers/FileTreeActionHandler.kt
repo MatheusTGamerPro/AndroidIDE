@@ -66,7 +66,7 @@ class FileTreeActionHandler : BaseEventHandler() {
 
   private var lastHeld: TreeNode? = null
   private var packageName: String = ""
-  private var LOG: ILogger = ILogger.newInstance("FileTreeActionHandler")
+  private var autoLayout: Boolean = false
 
   companion object {
     const val TAG_FILE_OPTIONS_FRAGMENT = "file_options_fragment"
@@ -213,6 +213,7 @@ class FileTreeActionHandler : BaseEventHandler() {
     builder.setPositiveButton(string.text_create) { dialogInterface, _ ->
       dialogInterface.dismiss()
       val name: String = binding.name.editText!!.text.toString().trim()
+      autoLayout = binding.checkButton.isChecked
       val pkgName = ProjectWriter.getPackageName(file)
       if (pkgName == null || pkgName.trim { it <= ' ' }.isEmpty()) {
         StudioApp.getInstance().toast(string.msg_get_package_failed, ERROR)
