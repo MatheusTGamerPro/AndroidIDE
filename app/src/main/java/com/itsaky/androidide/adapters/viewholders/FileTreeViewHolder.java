@@ -22,6 +22,8 @@ package com.itsaky.androidide.adapters.viewholders;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
+import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +43,7 @@ public class FileTreeViewHolder extends TreeNode.BaseNodeViewHolder<File> {
 
   private Context context;
   private ImageView chevron;
+  private ImageView imgIcon;
   private LayoutFiletreeItemBinding binding;
 
   public FileTreeViewHolder(Context context) {
@@ -51,6 +54,13 @@ public class FileTreeViewHolder extends TreeNode.BaseNodeViewHolder<File> {
   @Override
   public View createNodeView(TreeNode node, File file) {
     binding = LayoutFiletreeItemBinding.inflate(LayoutInflater.from(context));
+    Bitmap img;
+
+    File imgPath = new File(file);
+    if (imgPath.exists()) {
+      img = BitmapFactory.decodeFile(imgPath.getAbsolutePath());
+    }
+
     int dp15 =
         context instanceof StudioActivity
             ? ((StudioActivity) context).dpToPx(15)
@@ -64,6 +74,7 @@ public class FileTreeViewHolder extends TreeNode.BaseNodeViewHolder<File> {
     else if (file.getName().endsWith(".xml")) icon = R.drawable.ic_language_xml;
     else if (file.getName().endsWith(".gradle")) icon = R.drawable.ic_language_gradle;
     else if (file.getName().endsWith(".json")) icon = R.drawable.ic_language_json;
+    else if (file.getName().endsWith(".png")) binding.filetreeIcon.setImageBitmap(img);
     else icon = R.drawable.ic_file_unknown;
 
     final boolean isGradle =
