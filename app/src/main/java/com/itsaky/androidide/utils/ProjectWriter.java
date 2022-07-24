@@ -85,7 +85,7 @@ public class ProjectWriter {
         formatedName += name.charAt(index);
       }
     }
-    formatedName.trim();
+    formatedName.replace(" ", "_");
     return formatedName.toLowerCase();
   }
 
