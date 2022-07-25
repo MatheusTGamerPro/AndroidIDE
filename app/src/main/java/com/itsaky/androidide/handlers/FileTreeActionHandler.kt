@@ -67,6 +67,7 @@ class FileTreeActionHandler : BaseEventHandler() {
   private var lastHeld: TreeNode? = null
   private var packageName: String = ""
   private var autoLayout: Boolean = false
+  private var LOG: ILogger = ILogger.newInstance("FileTreeActionHandler")
 
   companion object {
     const val TAG_FILE_OPTIONS_FRAGMENT = "file_options_fragment"
@@ -256,11 +257,14 @@ class FileTreeActionHandler : BaseEventHandler() {
   
   private fun createAutoLayout(directory: File, fileName: String) {
     val app = StudioApp.getInstance()
-    val dirType = if (directory.toString().contains("/java/")) "java/" else "kotlin"
+    val dirType = if (directory.toString().contains("/java/")) "java" else "kotlin"
     val fileType = if (fileName.endsWith(".java")) ".java" else ".kt"
-    val projectDir = directory.toString().replace("$dirType$packageName", "res/layout/")
+    val projectDir = directory.toString().replace("/$dirType/$packageName/", "/res/layout/")
     val layoutName = ProjectWriter.createLayoutName(fileName.replace(fileType, ".xml"))
     val newFileLayout = File(projectDir, layoutName)
+
+    LOG.info("Directory: "+ projectDir)
+    LOG.info("DirType: "+ dirType)
 
     if (newFileLayout.exists()) {
       app.toast(string.msg_file_exists, ERROR)
