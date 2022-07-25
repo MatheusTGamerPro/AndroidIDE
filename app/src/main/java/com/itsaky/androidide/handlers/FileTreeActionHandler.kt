@@ -257,9 +257,10 @@ class FileTreeActionHandler : BaseEventHandler() {
   
   private fun createAutoLayout(directory: File, fileName: String) {
     val app = StudioApp.getInstance()
+    packageName = ProjectWriter.getPackageName(directory).replace(".", "/")
     val dirType = if (directory.toString().contains("/java/")) "java" else "kotlin"
     val fileType = if (fileName.endsWith(".java")) ".java" else ".kt"
-    val projectDir = directory.toString().replace("/$dirType/$packageName/", "/res/layout/")
+    val projectDir = directory.toString().replace("$dirType/$packageName", "res/layout/")
     val layoutName = ProjectWriter.createLayoutName(fileName.replace(fileType, ".xml"))
     val newFileLayout = File(projectDir, layoutName)
 
