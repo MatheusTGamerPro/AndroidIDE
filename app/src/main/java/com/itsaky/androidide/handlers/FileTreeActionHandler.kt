@@ -44,7 +44,6 @@ import com.itsaky.androidide.models.SheetOption
 import com.itsaky.androidide.projects.ProjectManager.getProjectDirPath
 import com.itsaky.androidide.utils.DialogUtils
 import com.itsaky.androidide.utils.Environment
-import com.itsaky.androidide.utils.ILogger
 import com.itsaky.androidide.utils.ProjectWriter
 import com.itsaky.toaster.Toaster.Type.ERROR
 import com.itsaky.toaster.Toaster.Type.SUCCESS
@@ -67,7 +66,6 @@ class FileTreeActionHandler : BaseEventHandler() {
   private var lastHeld: TreeNode? = null
   private var packageName: String = ""
   private var autoLayout: Boolean = false
-  private var LOG: ILogger = ILogger.newInstance("FileTreeActionHandler")
 
   companion object {
     const val TAG_FILE_OPTIONS_FRAGMENT = "file_options_fragment"
@@ -257,16 +255,9 @@ class FileTreeActionHandler : BaseEventHandler() {
   
   private fun createAutoLayout(directory: File, fileName: String) {
     val app = StudioApp.getInstance()
-    packageName = ProjectWriter.getPackageName(directory).replace(".", "/")
-    val dirType = if (directory.toString().contains("/java/")) "java" else "kotlin"
-    val fileType = if (fileName.endsWith(".java")) ".java" else ".kt"
-    val projectDir = directory.toString().replace("$dirType/$packageName", "res/layout/")
-    val layoutName = ProjectWriter.createLayoutName(fileName.replace(fileType, ".xml"))
+    val projectDir = directory.toString().replace("java/$packageName", "res/layout/")
+    val layoutName = ProjectWriter.createLayoutName(fileName.replace(".java", ".xml"))
     val newFileLayout = File(projectDir, layoutName)
-
-    LOG.info("Directory: "+ projectDir)
-    LOG.info("DirType: "+ dirType)
-
     if (newFileLayout.exists()) {
       app.toast(string.msg_file_exists, ERROR)
     } else {
@@ -363,7 +354,7 @@ class FileTreeActionHandler : BaseEventHandler() {
         app.toast(string.msg_file_exists, ERROR)
       } else {
         if (FileIOUtils.writeFileFromString(newFile, content)) {
-          if (autoLayout || name.endsWith(".kt")) createAutoLayout(directory, name)
+          if (autoLayout) createAutoLayout(directory, name)
           notifyFileCreated(newFile)
           // TODO Notify language servers about file created event
           app.toast(string.msg_file_created, SUCCESS)
