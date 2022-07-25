@@ -218,7 +218,7 @@ class FileTreeActionHandler : BaseEventHandler() {
       if (pkgName == null || pkgName.trim { it <= ' ' }.isEmpty()) {
         StudioApp.getInstance().toast(string.msg_get_package_failed, ERROR)
       } else {
-        packageName = pkgName.toString()
+        packageName = pkgName.toString().replace(".", "/")
         val id: Int = binding.typeGroup.checkedButtonId
         val javaName = if (name.endsWith(".java")) name else "$name.java"
         val className = if (!name.contains(".")) name else name.substring(0, name.lastIndexOf("."))
