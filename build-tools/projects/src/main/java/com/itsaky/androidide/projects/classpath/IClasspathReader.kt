@@ -15,27 +15,18 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.itsaky.androidide.lsp.models
+package com.itsaky.androidide.projects.classpath
 
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.ext.junit.runners.AndroidJUnit4
-
-import org.junit.Test
-import org.junit.runner.RunWith
-
-import org.junit.Assert.*
+import com.google.common.collect.ImmutableSet
+import java.io.File
 
 /**
- * Instrumented test, which will execute on an Android device.
+ * A classpath reader reads the entry from a JAR classpath file.
  *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * @author Akash Yadav
  */
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
-  @Test
-  fun useAppContext() {
-    // Context of the app under test.
-    val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-    assertEquals("com.itsaky.androidide.lsp.models.test", appContext.packageName)
-  }
+interface IClasspathReader {
+
+  /** List classes in the given JAR files. */
+  fun listClasses(files: Collection<File>): ImmutableSet<ClassInfo>
 }

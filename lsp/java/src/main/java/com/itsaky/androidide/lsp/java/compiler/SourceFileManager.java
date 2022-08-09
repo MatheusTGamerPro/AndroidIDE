@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 
 import com.blankj.utilcode.util.CloseUtils;
 import com.google.common.collect.Iterables;
+import com.itsaky.androidide.javac.services.fs.AndroidFsProviderImpl;
 import com.itsaky.androidide.projects.api.AndroidModule;
 import com.itsaky.androidide.projects.api.ModuleProject;
 import com.itsaky.androidide.projects.util.StringSearch;
@@ -28,6 +29,8 @@ import com.itsaky.androidide.utils.Environment;
 import com.itsaky.androidide.utils.ILogger;
 import com.itsaky.androidide.utils.SourceClassTrie;
 import com.sun.tools.javac.api.JavacTool;
+import com.sun.tools.javac.file.JavacFileManager;
+import com.sun.tools.javac.util.Context;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +65,8 @@ public class SourceFileManager extends ForwardingJavaFileManager<StandardJavaFil
   private SourceFileManager(final ModuleProject module) {
     super(createDelegateFileManager());
     this.module = module;
+    
+    AndroidFsProviderImpl.INSTANCE.init();
 
     if (module != null) {
       setLocation(StandardLocation.CLASS_PATH, module.getCompileClasspaths());
@@ -154,15 +159,6 @@ public class SourceFileManager extends ForwardingJavaFileManager<StandardJavaFil
     }
   }
 
-  private String packageNameOrEmpty(Path file) {
-    return this.module != null ? module.packageNameOrEmpty(file) : "";
-  }
-
-  private String removeExtension(String fileName) {
-    int lastDot = fileName.lastIndexOf(".");
-    return (lastDot == -1 ? fileName : fileName.substring(0, lastDot));
-  }
-
   @Override
   public boolean hasLocation(Location location) {
     return location == StandardLocation.SOURCE_PATH || super.hasLocation(location);
@@ -203,6 +199,21 @@ public class SourceFileManager extends ForwardingJavaFileManager<StandardJavaFil
       return module.compileJavaSourceClasses.findSource(source.path) != null;
     } else {
       return super.contains(location, file);
+    }
+  }
+
+  private String packageNameOrEmpty(Path file) {
+    return this.module != null ? module.packageNameOrEmpty(file) : "";
+  }
+
+  private String removeExtension(String fileName) {
+    int lastDot = fileName.lastIndexOf(".");
+    return (lastDot == -1 ? fileName : fileName.substring(0, lastDot));
+  }
+
+  public void setContext(Context context) {
+    if (fileManager instanceof JavacFileManager) {
+      ((JavacFileManager) fileManager).setContext(context);
     }
   }
 

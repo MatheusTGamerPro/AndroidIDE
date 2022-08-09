@@ -15,7 +15,7 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.itsaky.androidide.utils
+package com.itsaky.androidide.projects.classpath
 
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -27,13 +27,13 @@ import org.robolectric.annotation.Config
 /** @author Akash Yadav */
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.DEFAULT_VALUE_STRING)
-class ClasspathReaderTest {
+class ZipFileClasspathReaderTest {
 
   @Test
   fun testListClasses() {
     val classes =
-      ClasspathReader.listClasses(
-        listOf(File("../tests/test-project/app/src/main/resources/android.jar"))
+      ZipFileClasspathReader().listClasses(
+        listOf(File("../../tests/test-project/app/src/main/resources/android.jar"))
       )
 
     val context = classes.firstOrNull { it.name == "android.content.Context" }
