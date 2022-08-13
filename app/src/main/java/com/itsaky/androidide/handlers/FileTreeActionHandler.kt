@@ -261,11 +261,11 @@ class FileTreeActionHandler : BaseEventHandler() {
 
     if (newFileLayout.exists()) {
       app.toast(string.msg_file_exists, ERROR)
-      return false
+      return
     }
     if (!FileIOUtils.writeFileFromString(newFileLayout, ProjectWriter.createLayout())) {
       app.toast(string.msg_file_creation_failed, ERROR)
-      return false
+      return
     }
     notifyFileCreated(newFileLayout)
   }
@@ -350,15 +350,12 @@ class FileTreeActionHandler : BaseEventHandler() {
     val app = StudioApp.getInstance()
     if (name.length in 1..40 && !name.startsWith("/")) {
       val newFile = File(directory, name)
-
+      val isCreated: Boolean = false
       if (newFile.exists()) {
         app.toast(string.msg_file_exists, ERROR)
       } else {
-        if (autoLayout && !createAutoLayout(directory, name)) {
-            app.toast(string.msg_file_creation_failed, ERROR)
-            return
-        }
         if (FileIOUtils.writeFileFromString(newFile, content)) {
+          isCreated = true
           notifyFileCreated(newFile)
           // TODO Notify language servers about file created event
           app.toast(string.msg_file_created, SUCCESS)
@@ -370,6 +367,11 @@ class FileTreeActionHandler : BaseEventHandler() {
           } else {
             requestFileListing()
           }
+        } else {
+          app.toast(string.msg_file_creation_failed, ERROR)
+        }
+        if (autoLayout && isCreated) {
+          createAutoLayout(directory, name)
         } else {
           app.toast(string.msg_file_creation_failed, ERROR)
         }
