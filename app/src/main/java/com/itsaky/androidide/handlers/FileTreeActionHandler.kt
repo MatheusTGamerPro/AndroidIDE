@@ -65,6 +65,7 @@ class FileTreeActionHandler : BaseEventHandler() {
 
   private var lastHeld: TreeNode? = null
   private var packageName: String = ""
+  private var isFileCreated: Boolean = false
   private var autoLayout: Boolean = false
 
   companion object {
@@ -350,7 +351,6 @@ class FileTreeActionHandler : BaseEventHandler() {
     val app = StudioApp.getInstance()
     if (name.length in 1..40 && !name.startsWith("/")) {
       val newFile = File(directory, name)
-      val isCreated = false
       if (newFile.exists()) {
         app.toast(string.msg_file_exists, ERROR)
       } else {
@@ -370,7 +370,7 @@ class FileTreeActionHandler : BaseEventHandler() {
         } else {
           app.toast(string.msg_file_creation_failed, ERROR)
         }
-        if (autoLayout && isCreated) {
+        if (autoLayout && isFileCreated) {
           createAutoLayout(directory, name)
         } else {
           app.toast(string.msg_file_creation_failed, ERROR)
