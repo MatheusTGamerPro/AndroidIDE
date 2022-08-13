@@ -355,7 +355,7 @@ class FileTreeActionHandler : BaseEventHandler() {
         app.toast(string.msg_file_exists, ERROR)
       } else {
         if (FileIOUtils.writeFileFromString(newFile, content)) {
-          isFileCreated = true
+          if (autoLayout) isFileCreated = true
           notifyFileCreated(newFile)
           // TODO Notify language servers about file created event
           app.toast(string.msg_file_created, SUCCESS)
@@ -370,11 +370,7 @@ class FileTreeActionHandler : BaseEventHandler() {
         } else {
           app.toast(string.msg_file_creation_failed, ERROR)
         }
-        if (autoLayout && isFileCreated) {
-          createAutoLayout(directory, name)
-        } else {
-          app.toast(string.msg_file_creation_failed, ERROR)
-        }
+        if (isFileCreated) createAutoLayout(directory, name)
       }
     } else {
       app.toast(string.msg_invalid_name, ERROR)
