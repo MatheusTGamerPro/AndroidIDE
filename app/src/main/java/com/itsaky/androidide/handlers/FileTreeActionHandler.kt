@@ -258,15 +258,16 @@ class FileTreeActionHandler : BaseEventHandler() {
     val projectDir = directory.toString().replace("java/$packageName", "res/layout/")
     val layoutName = ProjectWriter.createLayoutName(fileName.replace(".java", ".xml"))
     val newFileLayout = File(projectDir, layoutName)
+
     if (newFileLayout.exists()) {
       app.toast(string.msg_file_exists, ERROR)
-    } else {
-      if (FileIOUtils.writeFileFromString(newFileLayout, ProjectWriter.createLayout())) {
-        notifyFileCreated(newFileLayout)
-      } else {
-        app.toast(string.msg_file_creation_failed, ERROR)
-      }
+      return
     }
+    if (!FileIOUtils.writeFileFromString(newFileLayout, ProjectWriter.createLayout())) {
+      app.toast(string.msg_file_creation_failed, ERROR)
+      return
+    }
+    notifyFileCreated(newFileLayout)
   }
 
   private fun createMenuRes(context: Context, file: File) {
