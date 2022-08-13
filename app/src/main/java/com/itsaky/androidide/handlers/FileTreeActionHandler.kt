@@ -350,7 +350,7 @@ class FileTreeActionHandler : BaseEventHandler() {
     val app = StudioApp.getInstance()
     if (name.length in 1..40 && !name.startsWith("/")) {
       val newFile = File(directory, name)
-      val isCreated: Boolean = false
+      val isCreated = false
       if (newFile.exists()) {
         app.toast(string.msg_file_exists, ERROR)
       } else {
